@@ -7,7 +7,7 @@ endif
 test:
 	go test -v ./...
 
-build: bin/acb
+build:
 	go build -C cmd -o ../bin/acb
 
 clean:

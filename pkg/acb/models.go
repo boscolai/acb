@@ -27,15 +27,16 @@ type JournalEntry struct {
 
 // Holding a security holding
 type Holding struct {
-	AccountNumber string       `csv:"Account number"`
-	TradeDate     DateTime     `csv:"Trade date"`
-	Market        string       `csv:"Market"`
-	Symbol        string       `csv:"Symbol"`
-	Quantity      float64      `csv:"Quantity"`
-	Price         float64      `csv:"Price"`
-	ACB           DollarAmount `csv:"ACB"`
-	MarketValue   float64      `csv:"Market value"`
-	BookValue     float64      `csv:"Book value"`
+	AccountNumber      string       `csv:"Account number"`
+	TradeDate          DateTime     `csv:"Trade date"`
+	Market             string       `csv:"Market"`
+	Symbol             string       `csv:"Symbol"`
+	Quantity           float64      `csv:"Quantity"`
+	Price              float64      `csv:"Price"`
+	ACB                DollarAmount `csv:"ACB"`
+	MarketValue        float64      `csv:"Market value"`
+	BookValue          float64      `csv:"Book value"`
+	TransferInQuantity float64      `csv:"Transfer in quantity"`
 }
 
 // GainLoss a sell transaction resulting in a gain or loss

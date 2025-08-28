@@ -11,6 +11,7 @@ const (
 	OpSplit       = "Stock Split"
 	OpExpiration  = "Expiration"
 	OpAssignation = "Assignation"
+	OpTransfer    = "Transfer"
 )
 
 type ACBResult struct {
@@ -118,6 +119,8 @@ func updateHoldings(holdings map[string]*Holding, tx *JournalEntry) (*GainLoss, 
 		handleExpiredOrAssigned(holding, tx)
 	case OpAssignation:
 		handleExpiredOrAssigned(holding, tx)
+	case OpTransfer:
+		handleTransfer(holding, tx)
 	}
 
 	if err != nil {
@@ -127,6 +130,17 @@ func updateHoldings(holdings map[string]*Holding, tx *JournalEntry) (*GainLoss, 
 		delete(holdings, tx.Symbol)
 	}
 	return gainLoss, nil
+}
+
+// handleTransfer handles transferred shares
+// TODO: nbdb does not provide cost in tranferred units in transaction history ...
+func handleTransfer(holding *Holding, tx *JournalEntry) {
+	holding.Quantity += tx.Quantity
+	if tx.Quantity > 0 {
+		// transfer in
+		holding.TransferInQuantity += tx.Quantity
+	}
+	// ignore transfer out for now
 }
 
 func handleBuy(holding *Holding, tx *JournalEntry) error {
@@ -162,6 +176,13 @@ func handleSell(holding *Holding, tx *JournalEntry) (*GainLoss, error) {
 	holding.Quantity -= tx.Quantity
 	holding.Price = tx.Price
 	holding.MarketValue = holding.Quantity * holding.Price
+
+	// handle the special case where the shares were obtained from transfer-ins and the price were unknown
+	if holding.TransferInQuantity >= tx.Quantity {
+		holding.TransferInQuantity -= tx.Quantity
+		gain.Cost = gain.Proceed
+		gain.Gain = DollarAmount(0)
+	}
 	return gain, nil
 }
 
